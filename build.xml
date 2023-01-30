@@ -67,13 +67,15 @@
     </jpp>
   </target>
 
+  <get src="https://github.com/martinpaljak/ant-javacard/releases/latest/download/ant-javacard.jar" dest="." skipexisting="true"/>
+  <taskdef name="javacard" classname="pro.javacard.ant.JavaCard" classpath="ant-javacard.jar"/>
+
   <target name="dist" depends="preprocess" description="generate the distribution">
     <tstamp/>
-    <ant dir="ext/ant"/>
     <!-- Create the distribution directory -->
-    <taskdef name="javacard" classname="pro.javacard.ant.JavaCard" classpath="ext/ant/ant-javacard.jar"/>
-    <javacard>
-      <cap aid="a0:00:00:03:08:00:00:10" output="bin/PivApplet.cap" sources="src-gen" classes="bin" version="1.0">
+    <taskdef name="javacard" classname="pro.javacard.ant.JavaCard" classpath="ant-javacard.jar"/>
+    <javacard jckit="ext/sdks/jc310r20210706_kit">
+      <cap targetsdk="ext/sdks/jc304_kit" aid="a0:00:00:03:08:00:00:10" output="bin/PivApplet.cap" sources="src-gen" classes="bin" version="1.0">
         <applet class="net.cooperi.pivapplet.PivApplet" aid="a0:00:00:03:08:00:00:10:00:01:00"/>
       </cap>
     </javacard>
