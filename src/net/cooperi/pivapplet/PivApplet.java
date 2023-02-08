@@ -196,7 +196,7 @@ public class PivApplet extends Applet
 	private KeyAgreement ecdh = null;
 	private KeyAgreement ecdhSha = null;
 
-	private static final byte MAX_SLOTS = (byte)17;
+	private static final byte MAX_SLOTS = (byte)26;
 
 	private static final byte SLOT_9A = (byte)0;
 	private static final byte SLOT_9B = (byte)1;
@@ -204,14 +204,14 @@ public class PivApplet extends Applet
 	private static final byte SLOT_9D = (byte)3;
 	private static final byte SLOT_9E = (byte)4;
 	private static final byte SLOT_82 = (byte)5;
-	private static final byte SLOT_8C = (byte)15;
-	private static final byte SLOT_F9 = (byte)16;
+	private static final byte SLOT_95 = (byte)24;
+	private static final byte SLOT_F9 = (byte)25;
 	private PivSlot[] slots = null;
 	private byte retiredKeys = 0;
 
 	private static final byte SLOT_MIN_HIST = SLOT_82;
 	private static final byte MIN_HIST_SLOT = (byte)0x82;
-	private static final byte MAX_HIST_SLOT = (byte)0x8C;
+	private static final byte MAX_HIST_SLOT = (byte)0x95;
 
 	private static final byte PIV_ALG_DEFAULT = (byte)0x00;
 	private static final byte PIV_ALG_3DES = (byte)0x03;
@@ -240,9 +240,9 @@ public class PivApplet extends Applet
 	private static final byte TAG_CERT_9D = (byte)0x0B;
 	private static final byte TAG_KEYHIST = (byte)0x0C;
 	private static final byte TAG_CERT_82 = (byte)0x0D;
-	private static final byte TAG_CERT_8C = (byte)0x17;
+	private static final byte TAG_CERT_95 = (byte)0x20;
 
-	private static final byte TAG_MAX = TAG_CERT_8C;
+	private static final byte TAG_MAX = TAG_CERT_95;
 	private File[] files = null;
 
 	private static final byte TAG_YK_PIVMAN = (byte)0x00;
@@ -394,7 +394,7 @@ public class PivApplet extends Applet
 		slots = new PivSlot[MAX_SLOTS];
 		for (byte i = SLOT_9A; i <= SLOT_9E; ++i)
 			slots[i] = new PivSlot((byte)((byte)0x9A + i));
-		for (byte i = SLOT_82; i <= SLOT_8C; ++i)
+		for (byte i = SLOT_82; i <= SLOT_95; ++i)
 			slots[i] = new PivSlot((byte)((byte)0x82 + i));
 //#if YKPIV_ATTESTATION
 		slots[SLOT_F9] = new PivSlot((byte)0xF9);
