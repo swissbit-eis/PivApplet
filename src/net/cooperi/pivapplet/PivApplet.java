@@ -50,7 +50,8 @@ public class PivApplet extends Applet
 
 	private static final byte[] APP_NAME = {
 	    'P', 'i', 'v', 'A', 'p', 'p', 'l', 'e', 't', ' ',
-	    'v', '0', '.', '9', '.', '0', '/',
+	    'v', '0', '.', '9', '.', '1', '-', 's', 'w', 'i',
+	    's', 's', 'b', 'i', 't', '/',
 //#if PIV_SUPPORT_RSA
 	    'R',
 //#endif
@@ -85,7 +86,7 @@ public class PivApplet extends Applet
 
 	private static final byte[] APP_URI = {
 	    'g', 'i', 't', 'h', 'u', 'b', '.', 'c', 'o', 'm', '/',
-	    'a', 'r', 'e', 'k', 'i', 'n', 'a', 't', 'h', '/',
+	    's', 'w', 'i', 's', 's', 'b', 'i', 't', '-', 'e', 'i', 's', '/',
 	    'P', 'i', 'v', 'A', 'p', 'p', 'l', 'e', 't'
 	};
 
