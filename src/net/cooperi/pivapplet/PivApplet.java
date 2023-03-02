@@ -139,6 +139,9 @@ public class PivApplet extends Applet
 	private static final byte INS_GET_SERIAL = (byte)0xf8;
 	private static final byte INS_GET_MDATA = (byte)0xf7;
 
+	/* SwissbitPIV extensions */
+	private static final byte INS_SET_SERIAL = (byte)0xf6;
+
 	/* Our own private extensions. */
 	private static final byte INS_SG_DEBUG = (byte)0xe0;
 
@@ -182,6 +185,8 @@ public class PivApplet extends Applet
 	private boolean pivPinIsDefault = true;
 	private boolean pukPinIsDefault = true;
 	private boolean mgmtKeyIsDefault = true;
+	private boolean serialIsFrozen = false;
+	private short serialLength;
 	private byte pinRetries;
 	private byte pukRetries;
 
@@ -255,6 +260,9 @@ public class PivApplet extends Applet
 	private static final byte ALG_EC_SVDP_DHC_PLAIN = (byte)4;
 	private static final byte ALG_EC_SVDP_DH_PLAIN_XY = (byte)6;
 	private static final byte ALG_RSA_SHA_256_PKCS1 = (byte)40;
+
+	private static final byte MIN_SERIAL_LENGTH = (byte)4;
+	private static final byte MAX_SERIAL_LENGTH = (byte)8;
 
 	public static void
 	install(byte[] info, short off, byte len)
@@ -384,8 +392,9 @@ public class PivApplet extends Applet
 		randData.generateData(cardId, (short)CARD_ID_FIXED.length,
 		    (short)(21 - (short)CARD_ID_FIXED.length));
 
-		serial = new byte[4];
-		randData.generateData(serial, (short)0, (short)4);
+		serialLength = (short)4;
+		serial = new byte[MAX_SERIAL_LENGTH];
+		randData.generateData(serial, (short)0, serialLength);
 		serial[0] |= (byte)0x80;
 
 		certSerial = new byte[16];
@@ -550,6 +559,9 @@ public class PivApplet extends Applet
 		case INS_SET_PIN_RETRIES:
 			processSetPinRetries(apdu);
 			break;
+		case INS_SET_SERIAL:
+			processSetSerial(apdu);
+			break;
 		case INS_RESET:
 			processReset(apdu);
 			break;
@@ -648,10 +660,9 @@ public class PivApplet extends Applet
 		final byte[] buffer = apdu.getBuffer();
 
 		le = apdu.setOutgoing();
-		buffer[len++] = serial[0];
-		buffer[len++] = serial[1];
-		buffer[len++] = serial[2];
-		buffer[len++] = serial[3];
+		for (byte i = 0; i < (byte)serialLength; ++i) {
+			buffer[len++] = serial[i];
+		}
 
 		len = le > 0 ? (le > len ? len : le) : len;
 		apdu.setOutgoingLength(len);
@@ -2631,6 +2642,43 @@ public class PivApplet extends Applet
 		pukPin.update(DEFAULT_PUK, (short)0, (byte)8);
 		pukPinIsDefault = true;
 		pukRetries = pukTries;
+	}
+
+	private void
+	processSetSerial(APDU apdu)
+	{
+		final byte[] buffer = apdu.getBuffer();
+		final byte freezeSerial = buffer[ISO7816.OFFSET_P2];
+		short lc, serialOffset;
+
+		if (buffer[ISO7816.OFFSET_P1] != 0 || (freezeSerial != 0 && freezeSerial != 1)) {
+			ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
+		}
+
+		if (serialIsFrozen) {
+			ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+		}
+
+		lc = apdu.setIncomingAndReceive();
+//#if APPLET_EXTLEN
+		final short inLc = apdu.getIncomingLength();
+/*#else
+		final short inLc = getIncomingLengthCompat(apdu);
+#endif*/
+		if (lc != inLc || lc < MIN_SERIAL_LENGTH || lc > MAX_SERIAL_LENGTH) {
+			ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+			return;
+		}
+
+		// Set serial number and freeze it if requested
+		JCSystem.beginTransaction();
+		serialOffset = apdu.getOffsetCdata();
+		Util.arrayCopyNonAtomic(buffer, serialOffset, serial, (short) 0, lc);
+		serialLength = lc;
+		if (freezeSerial != 0) {
+			serialIsFrozen = true;
+		}
+		JCSystem.commitTransaction();
 	}
 
 	private void
