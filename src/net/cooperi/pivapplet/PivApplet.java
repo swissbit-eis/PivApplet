@@ -2428,8 +2428,10 @@ public class PivApplet extends Applet
 				return;
 
 			} else {
-				ISOException.throwIt((short)(
-				    (short)0x63C0 | pin.getTriesRemaining()));
+				short tries = pin.getTriesRemaining();
+				if (tries > 0x0f)
+					tries = 0x0f;
+				ISOException.throwIt((short) ((short) 0x63C0 | tries));
 				return;
 			}
 		}
@@ -2442,8 +2444,10 @@ public class PivApplet extends Applet
 		if (!pin.check(buffer, pinOff, (byte)8)) {
 			eraseKeysIfPukPinBlocked();
 			syncSecurityStatus();
-			ISOException.throwIt((short)(
-			    (short)0x63C0 | pin.getTriesRemaining()));
+			short tries = pin.getTriesRemaining();
+			if (tries > 0x0f)
+				tries = 0x0f;
+			ISOException.throwIt((short) ((short) 0x63C0 | tries));
 			return;
 		}
 
@@ -2506,8 +2510,10 @@ public class PivApplet extends Applet
 
 		if (!pin.check(buffer, oldPinOff, (byte)8)) {
 			eraseKeysIfPukPinBlocked();
-			ISOException.throwIt((short)(
-			    (short)0x63C0 | pin.getTriesRemaining()));
+			short tries = pin.getTriesRemaining();
+			if (tries > 0x0f)
+				tries = 0x0f;
+			ISOException.throwIt((short) ((short) 0x63C0 | tries));
 			return;
 		}
 
@@ -2590,8 +2596,10 @@ public class PivApplet extends Applet
 
 		if (!pukPin.check(buffer, pukOff, (byte)8)) {
 			eraseKeysIfPukPinBlocked();
-			ISOException.throwIt((short)(
-			    (short)0x63C0 | pukPin.getTriesRemaining()));
+			short tries = pukPin.getTriesRemaining();
+			if (tries > 0x0f)
+				tries = 0x0f;
+			ISOException.throwIt((short) ((short) 0x63C0 | tries));
 			return;
 		}
 
