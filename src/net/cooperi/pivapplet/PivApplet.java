@@ -2428,10 +2428,7 @@ public class PivApplet extends Applet
 				return;
 
 			} else {
-				short tries = pin.getTriesRemaining();
-				if (tries > 0x0f)
-					tries = 0x0f;
-				ISOException.throwIt((short) ((short) 0x63C0 | tries));
+				throwPinVerificationException(pin);
 				return;
 			}
 		}
@@ -2444,10 +2441,7 @@ public class PivApplet extends Applet
 		if (!pin.check(buffer, pinOff, (byte)8)) {
 			eraseKeysIfPukPinBlocked();
 			syncSecurityStatus();
-			short tries = pin.getTriesRemaining();
-			if (tries > 0x0f)
-				tries = 0x0f;
-			ISOException.throwIt((short) ((short) 0x63C0 | tries));
+			throwPinVerificationException(pin);
 			return;
 		}
 
@@ -2510,10 +2504,7 @@ public class PivApplet extends Applet
 
 		if (!pin.check(buffer, oldPinOff, (byte)8)) {
 			eraseKeysIfPukPinBlocked();
-			short tries = pin.getTriesRemaining();
-			if (tries > 0x0f)
-				tries = 0x0f;
-			ISOException.throwIt((short) ((short) 0x63C0 | tries));
+			throwPinVerificationException(pin);
 			return;
 		}
 
@@ -2596,10 +2587,7 @@ public class PivApplet extends Applet
 
 		if (!pukPin.check(buffer, pukOff, (byte)8)) {
 			eraseKeysIfPukPinBlocked();
-			short tries = pukPin.getTriesRemaining();
-			if (tries > 0x0f)
-				tries = 0x0f;
-			ISOException.throwIt((short) ((short) 0x63C0 | tries));
+			throwPinVerificationException(pukPin);
 			return;
 		}
 
@@ -3034,6 +3022,13 @@ public class PivApplet extends Applet
 			slot.flags[PivSlot.F_UNLOCKED] = pivPin.isValidated();
 			slot.flags[PivSlot.F_AFTER_VERIFY] = false;
 		}
+	}
+
+	private void throwPinVerificationException(final OwnerPIN pin) {
+		short tries = pin.getTriesRemaining();
+		if (tries > 0x0f)
+			tries = 0x0f;
+		ISOException.throwIt((short) ((short) 0x63C0 | tries));
 	}
 
 	private void
