@@ -139,7 +139,7 @@ public class PivApplet extends Applet
 	private static final byte INS_GET_SERIAL = (byte)0xf8;
 	private static final byte INS_GET_MDATA = (byte)0xf7;
 
-	/* SwissbitPIV extensions we support */
+	/* SwissbitPIV extensions */
 	private static final byte INS_SET_SERIAL = (byte)0xf6;
 
 	/* Our own private extensions. */
@@ -185,7 +185,7 @@ public class PivApplet extends Applet
 	private boolean pivPinIsDefault = true;
 	private boolean pukPinIsDefault = true;
 	private boolean mgmtKeyIsDefault = true;
-	private boolean serialIsFreezed = false;
+	private boolean serialIsFrozen = false;
 	private short serialLength;
 	private byte pinRetries;
 	private byte pukRetries;
@@ -2655,7 +2655,7 @@ public class PivApplet extends Applet
 			ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
 		}
 
-		if (serialIsFreezed) {
+		if (serialIsFrozen) {
 			ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
 		}
 
@@ -2676,7 +2676,7 @@ public class PivApplet extends Applet
 		Util.arrayCopyNonAtomic(buffer, serialOffset, serial, (short) 0, lc);
 		serialLength = lc;
 		if (freezeSerial != 0) {
-			serialIsFreezed = true;
+			serialIsFrozen = true;
 		}
 		JCSystem.commitTransaction();
 	}
